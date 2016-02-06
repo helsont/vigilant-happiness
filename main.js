@@ -76,23 +76,25 @@ function getAllNearbyRestaurants(locationURL) {
     };
     return Promise.all(list);
   }).then(function(result) {
-    console.log(result);
-    for (var r in result[0]) {
-      var venue = result[0][r];
-      var name = venue[0];
-      var dist = venue[1];
-      var lat = venue[2];
-      var lng = venue[3];
-      if (name in restaurants) {
-        if (dist < restaurants[name]['distance']) {
-          restaurant[name] = {'dist':dist, 'lat':lat, 'lng':lng};
-        }
-      }
-      else {
-        restaurants[name] = {'dist':dist, 'lat':lat, 'lng':lng};
-      } 
-    }
-    console.log(restaurants);
+    // var sheng = result[0]
+    console.log(result[0]);
+    // for (var r in sheng) {
+      // console.log(sheng[r]);
+      // var venue = result[0][r];
+      // var name = venue[0];
+      // var dist = venue[1];
+      // var lat = venue[2];
+      // var lng = venue[3];
+      // if (name in restaurants) {
+      //   if (dist < restaurants[name]['distance']) {
+      //     restaurant[name] = {'dist':dist, 'lat':lat, 'lng':lng};
+      //   }
+      // }
+      // else {
+      //   restaurants[name] = {'dist':dist, 'lat':lat, 'lng':lng};
+      // } 
+    // }
+    // console.log(restaurants);
 
     // console.log(restaurants);
   }).catch(function(error) {
