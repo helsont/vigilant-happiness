@@ -3,7 +3,8 @@ var Promise = require('bluebird');
 var fs = require('fs');
 var express = require('express');
 var app = express();
-app.listen(6969)
+var port = process.env.PORT || 5000
+app.listen(port)
 // make a request to bing maps
 //var mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=tampa%2Cfl&wp.1=portland%2Cor&avoid=minimizeTolls&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR'
 
@@ -125,5 +126,5 @@ app.get('/', function(req, res) {
 // check if there is a start and end
   getAllNearbyRestaurantsAlongRoute(start, end).then(function(restaurants) {
     res.send(restaurants);
-  }) 
+  })
 })
