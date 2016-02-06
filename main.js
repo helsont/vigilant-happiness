@@ -5,22 +5,30 @@ URL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=redmond%2Cwa&wp.
 
 //Lets try to make a HTTPS GET request to modulus.io's website.
 //All we did here to make HTTPS call is changed the `http` to `https` in URL.
-request(URL, function (error, response, body) {
+function getRouteParams(url) {
+request(url, function (error, response, body) {
     //Check for error
     if(error){
-        return console.log('Error:', error);
+      return console.log('Error:', error);
     }
 
     //Check for right status code
     if(response.statusCode !== 200){
-        return console.log('Invalid Status Code Returned:', response.statusCode);
+      return console.log('Invalid Status Code Returned:', response.statusCode);
     }
     //All is good. Print the body
     var data = JSON.parse(body);
-    var trafficTime = data['resourceSets']
-    var important = data['resourceSets'][0]['resources'][0]['routeLegs'][0];
-    var points = important['itineraryItems'].map(function(value) {
+    var important = data['resourceSets'][0]['resources'][0]
+    var travelDurationTraffic = important['travelDurationTraffic'];
+    var travelDistance = important['travelDistance'];
+    var waypoints = important['routeLegs'][0]['itineraryItems'].map(function(value) {
       return value['maneuverPoint']['coordinates'];
     });
-    console.log(trafficTime);
+    var res = {'waypoints': waypoints,
+            'travelDurationTraffic': travelDurationTraffic,
+            'travelDistance': travelDistance};
+    console.log(res);
+    // console.log(travelDistance);
+    // console.log(travelDurationTraffic);
 });
+}
