@@ -45,7 +45,7 @@ function getRouteParams(beginning, middle, end) {
 
 function getNearbyRestaurants(lat, lng) {
   // TODO: WE NEED AN API KEY FOR THIS !!!!!!!!!!!!!!!!!!!
-  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=5&oauth_token=BWMSGIL3SRZ5L1QMFLZCRFJYWSJGW4BNR1NINN2NTHTQ3GCR&v=20160206'
+  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=800&limit=5&oauth_token=BWMSGIL3SRZ5L1QMFLZCRFJYWSJGW4BNR1NINN2NTHTQ3GCR&v=20160206'
     return new Promise(function(resolve, reject) {
       request(foursquareURL, function (error, response, body) {
         //Check for error
