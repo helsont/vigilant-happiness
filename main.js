@@ -12,14 +12,14 @@ function getRouteParams(beginning, middle, end) {
   else {
     mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&wp.1='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
   }
-  //console.log(mapURL)
+  
   return new Promise(function(resolve, reject) {
     // POSSIBLE RUNTIME BOTTLENECK: too many waypoints
     request(mapURL, function (error, response, body) {
       //Check for error
       if(error){
         reject(error);
-        // return console.log('Error:', error);
+        
       }
 
       //Check for right status code
@@ -65,11 +65,12 @@ function getNearbyRestaurants(lat, lng) {
     var data = JSON.parse(body);
     var important = data['response']['groups'][0]['items'];
     var places = important.map(function(value) {
-    var venue = value['venue']
-      return [venue['name'],
-              venue['location']['distance'],
-              venue['location']['lat'],
-              venue['location']['lng']];
+      return value['venue']
+    // console.log(value['venue'])
+      // return [venue['name'],
+              // venue['location']['distance'],
+              // venue['location']['lat'],
+              // venue['location']['lng']];
     });
     resolve(places);
   });
@@ -77,32 +78,32 @@ function getNearbyRestaurants(lat, lng) {
 }
 
 //recalculateRoute('45,-118','46,-118','47,-118')
-function getAllNearbyRestaurantsFile(locationURL) {
-  restaurants = {};
-  var result;
-  fs.readFile('result.json', 'utf8', function(err, data) {
-    if (err) throw err;
-    result = JSON.parse(data)
-    // console.log(result)
-    for (var waypoint in result) {
-      for (var restaurant in result[waypoint]) {
-        var r = result[waypoint][restaurant]
-        var name = r[0]
-        var dist = r[1]
-        var lat = r[2]
-        var lng = r[3]
-        if (name in restaurants) {
-          if (dist < restaurants[name]['distance']) {
-            restaurant[name] = {'dist':dist, 'lat':lat, 'lng':lng};
-          }
-        }
-        else {
-          restaurants[name] = {'dist':dist, 'lat':lat, 'lng':lng};
-        }
-      }
-    }
-  })
-};
+// function getAllNearbyRestaurantsFile(locationURL) {
+//   restaurants = {};
+//   var result;
+//   fs.readFile('result.json', 'utf8', function(err, data) {
+//     if (err) throw err;
+//     result = JSON.parse(data)
+//     // console.log(result)
+//     for (var waypoint in result) {
+//       for (var restaurant in result[waypoint]) {
+//         var r = result[waypoint][restaurant]
+//         var name = r[0]
+//         var dist = r[1]
+//         var lat = r[2]
+//         var lng = r[3]
+//         if (name in restaurants) {
+//           if (dist < restaurants[name]['distance']) {
+//             restaurant[name] = {'dist':dist, 'lat':lat, 'lng':lng};
+//           }
+//         }
+//         else {
+//           restaurants[name] = {'dist':dist, 'lat':lat, 'lng':lng};
+//         }
+//       }
+//     }
+//   })
+// };
 //   getRouteParams(mapURL).then(function(routeParams) {
 //     var waypoints = routeParams['waypoints'];
 //     var list = [];
@@ -227,7 +228,6 @@ function getAllNearbyRestaurantsFile(locationURL) {
 //   // })
 //}
 function getAllNearbyRestaurants(start, end) {
-  restaurants = {}
   getRouteParams(start, '', end).then(function(routeParams) {
     var waypoints = routeParams['waypoints'];
     var list = [];
@@ -237,41 +237,42 @@ function getAllNearbyRestaurants(start, end) {
     };
     return Promise.all(list);
   }).then(function(result) {
+    restaurants = {}
     for (var waypoint in result) {
       for (var restaurant in result[waypoint]) {
         var r = result[waypoint][restaurant]
-          var name = r[0]
-          var dist = r[1]
-          var lat = r[2]
-          var lng = r[3]
+          var name = r['name']
+          var dist = r['location']['distance']
           if (name in restaurants) {
-            if (dist < restaurants[name]['distance']) {
-              restaurant[name] = {'dist':dist, 'lat':lat, 'lng':lng};
+            if (dist < restaurants[name]['location']['distance']) {
+              restaurants[name] = r;
             }
           }
           else {
-            restaurants[name] = {'dist':dist, 'lat':lat, 'lng':lng};
+            restaurants[name] = r;
           }
       }
     }
     var sortedArr = []
-    keysSorted = Object.keys(restaurants).sort(function(a,b){return restaurants[a]['dist'] - restaurants[b]['dist']})
+    keysSorted = Object.keys(restaurants).sort(function(a,b){return restaurants[a]['location']['distance'] - restaurants[b]['location']['distance']})
     for (var key in keysSorted) {
-      //console.log(restaurants[keysSorted[key]])
-      sortedArr.push([keysSorted[key], restaurants[keysSorted[key]]])
+      sortedArr.push(restaurants[keysSorted[key]])
     }
-    console.log(sortedArr)
-//    for (var rest in restaurants) {
-//      sortable.push([rest, restaurants[rest]])
-//    }
-//    sortable.sort(function(a, b) {return restaurants[a]['dist'] - restaurants[b]['dist']})
-//    console.log(sortable)
+
+    // HELSON HOW DO YOU RETURN THIS??
+    if (sortedArr.length > 20) {
+      return sortedArr.slice(0, sortedArr.length - 1)
+    }
+    else {
+      return sortedArr.slice(0,19)
+    }
 
   }).catch(function(error) {
     console.log(error)
   });
 };
-getAllNearbyRestaurants('45,-114', '47,-114')
+
+console.log(getAllNearbyRestaurants('45,-114', '47,-114'))
 
 //}).catch(function(error) {
   //console.log(error);
