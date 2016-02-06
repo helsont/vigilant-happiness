@@ -3,16 +3,19 @@ var Promise = require('bluebird');
 var fs = require('fs');
 var express = require('express');
 var app = express();
-var port = process.env.PORT || 5000
+var port = process.env.PORT || 6000
+var fourSquareAuthToken = process.env.FOUR_SQUARE_AUTH_TOKEN || 'BWMSGIL3SRZ5L1QMFLZCRFJYWSJGW4BNR1NINN2NTHTQ3GCR';
+var bingToken = process.env.BING_TOKEN || 'AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
+
 app.listen(port)
 
 function getRouteParams(beginning, middle, end) {
   var mapURL;
   if (middle) {
-    mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&vwp.1='+middle+'&wp.2='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
+    mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&vwp.1='+middle+'&wp.2='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key='+ bingToken;
   }
   else {
-    mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&wp.1='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
+    mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&wp.1='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key=' + bingToken;
   }
   // for testing purposes
   //mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=boston,ma&wp.1=portland,or&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
@@ -47,7 +50,7 @@ function getRouteParams(beginning, middle, end) {
 
 function getNearbyRestaurants(lat, lng) {
   // TODO: WE NEED AN API KEY FOR THIS !!!!!!!!!!!!!!!!!!!
-  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=8&oauth_token=BWMSGIL3SRZ5L1QMFLZCRFJYWSJGW4BNR1NINN2NTHTQ3GCR&v=20160206'
+  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=8&oauth_token=' + fourSquareAuthToken + '&v=20160206'
     return new Promise(function(resolve, reject) {
       request(foursquareURL, function (error, response, body) {
         //Check for error
