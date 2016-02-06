@@ -5,8 +5,6 @@ var express = require('express');
 var app = express();
 var port = process.env.PORT || 5000
 app.listen(port)
-// make a request to bing maps
-//var mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=tampa%2Cfl&wp.1=portland%2Cor&avoid=minimizeTolls&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR'
 
 function getRouteParams(beginning, middle, end) {
   var mapURL;
@@ -29,7 +27,6 @@ function getRouteParams(beginning, middle, end) {
       //Check for right status code
       if(response.statusCode !== 200){
         reject(response);
-        // return console.log('Invalid Status Code Returned:', response.statusCode);
       }
       //All is good. Print the body
       var data = JSON.parse(body);
@@ -50,31 +47,27 @@ function getRouteParams(beginning, middle, end) {
 }
 
 function getNearbyRestaurants(lat, lng) {
-  // var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+','+lng+'&section=food&limit=5oauth_token=AsSKpIwIftCSooG2C2GqXtK83nmSIj3IHfHN28vLJXYbVJ_p-x8Zs_3lm6ZBvu4k&v=20160206'
   var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=5&oauth_token=NPN00URCD44DLRMPRXQSZNOKCUQJS0L23UC0UGIYC4BHTKPY&v=20160206'
-  //var bingURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=2000&limit=5&oauth_token=L2BK0KGD3VN5FXF1QXUQZZEWNMXGFIBTSSACXU5KYEDLNIWL&v=20160205'
-  return new Promise(function(resolve, reject) {
-    request(foursquareURL, function (error, response, body) {
-    //Check for error
-    if(error){
-      reject(error);
-      // return console.log('Error:', error);
-    }
-    //Check for right status code
-    if(response.statusCode !== 200){
-      // return console.log('Invalid Status Code Returned:', response.statusCode);
-      reject(response);
-    }
-    //All is good. Print the body
-    var data = JSON.parse(body);
-    var important = data['response']['groups'][0]['items'];
-    var places = important.map(function(value) {
-      return value['venue']
+    return new Promise(function(resolve, reject) {
+      request(foursquareURL, function (error, response, body) {
+        //Check for error
+        if(error){
+          reject(error);
+        }
+        //Check for right status code
+        if(response.statusCode !== 200){
+          reject(response);
+        }
+        //All is good. Print the body
+        var data = JSON.parse(body);
+        var important = data['response']['groups'][0]['items'];
+        var places = important.map(function(value) {
+          return value['venue']
 
+        });
+        resolve(places);
+      });
     });
-    resolve(places);
-  });
-  });
 }
 
 function getAllNearbyRestaurantsAlongRoute(start, end) {
@@ -123,8 +116,8 @@ app.get('/', function(req, res) {
   var start = req.query.start,
   end = req.query.end
 
-// check if there is a start and end
   getAllNearbyRestaurantsAlongRoute(start, end).then(function(restaurants) {
+    res.writeHead(200, {'Access-Control-Allow-Origin':'*'});
     res.send(restaurants);
   })
 })
