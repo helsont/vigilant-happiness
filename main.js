@@ -1,7 +1,7 @@
 var request = require('request');
 var Promise = require('bluebird');
 // make a request to bing maps
-var mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=tampa%2Cfl&wp.1=portland%2Cor&avoid=minimizeTolls&key=AsdaxrvLRHyT6eEvSGDY81S2y3_ifh10egwFAMzIOLtxv0ZlwkPE2yG7jMzXzVkp'
+var mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=tampa%2Cfl&wp.1=portland%2Cor&avoid=minimizeTolls&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR'
 
 function getRouteParams(url) {
   return new Promise(function(resolve, reject) {
@@ -37,9 +37,11 @@ function getRouteParams(url) {
 }
 
 function getNearbyRestaurants(lat, lng) {
-  var bingURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=2000&limit=20&oauth_token=L2BK0KGD3VN5FXF1QXUQZZEWNMXGFIBTSSACXU5KYEDLNIWL&v=20160205'
+  // var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+','+lng+'&section=food&limit=5oauth_token=AsSKpIwIftCSooG2C2GqXtK83nmSIj3IHfHN28vLJXYbVJ_p-x8Zs_3lm6ZBvu4k&v=20160206'
+  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=5&oauth_token=NPN00URCD44DLRMPRXQSZNOKCUQJS0L23UC0UGIYC4BHTKPY&v=20160206'
+  //var bingURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=2000&limit=5&oauth_token=L2BK0KGD3VN5FXF1QXUQZZEWNMXGFIBTSSACXU5KYEDLNIWL&v=20160205'
   return new Promise(function(resolve, reject) {
-    request(bingURL, function (error, response, body) {
+    request(foursquareURL, function (error, response, body) {
     //Check for error
     if(error){
       reject(error);
@@ -64,7 +66,7 @@ function getNearbyRestaurants(lat, lng) {
   });
   });
 }
-
+// getNearbyRestaurants(45, -115);
 function getAllNearbyRestaurants(locationURL) {
   restaurants = {};
   getRouteParams(mapURL).then(function(routeParams) {
@@ -74,10 +76,12 @@ function getAllNearbyRestaurants(locationURL) {
       var lat = waypoints[waypoint][0], lng = waypoints[waypoint][1];
       list.push(getNearbyRestaurants(lat, lng));
     };
+    // console.log(list);
     return Promise.all(list);
   }).then(function(result) {
+    console.log(result);
     // var sheng = result[0]
-    console.log(result[0]);
+    // console.log(result);
     // for (var r in sheng) {
       // console.log(sheng[r]);
       // var venue = result[0][r];
