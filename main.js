@@ -227,53 +227,50 @@ function getNearbyRestaurants(lat, lng) {
 //   //   console.log(error);
 //   // })
 //}
-function getAllNearbyRestaurants(start, end) {
-  getRouteParams(start, '', end).then(function(routeParams) {
-    var waypoints = routeParams['waypoints'];
-    var list = [];
-    for (var waypoint in waypoints) {
-      var lat = waypoints[waypoint][0], lng = waypoints[waypoint][1];
-      list.push(getNearbyRestaurants(lat, lng));
-    };
-    return Promise.all(list);
-  }).then(function(result) {
-    restaurants = {}
-    for (var waypoint in result) {
-      for (var restaurant in result[waypoint]) {
-        var r = result[waypoint][restaurant]
-          var name = r['name']
-          var dist = r['location']['distance']
-          if (name in restaurants) {
-            if (dist < restaurants[name]['location']['distance']) {
+function getAllNearbyRestaurantsAlongRoute(start, end) {
+  return new Promise(function(resolve, reject) {
+    return getRouteParams(start, '', end).then(function(routeParams) {
+      var waypoints = routeParams['waypoints'];
+      var list = [];
+      for (var waypoint in waypoints) {
+        var lat = waypoints[waypoint][0], lng = waypoints[waypoint][1];
+        list.push(getNearbyRestaurants(lat, lng));
+      };
+      return Promise.all(list);
+    }).then(function(result) {
+      restaurants = {}
+      for (var waypoint in result) {
+        for (var restaurant in result[waypoint]) {
+          var r = result[waypoint][restaurant]
+            var name = r['name']
+            var dist = r['location']['distance']
+            if (name in restaurants) {
+              if (dist < restaurants[name]['location']['distance']) {
+                restaurants[name] = r;
+              }
+            }
+            else {
               restaurants[name] = r;
             }
-          }
-          else {
-            restaurants[name] = r;
-          }
+        }
       }
-    }
-    var sortedArr = []
-      keysSorted = Object.keys(restaurants).sort(function(a,b){return restaurants[a]['location']['distance'] - restaurants[b]['location']['distance']})
-      for (var key in keysSorted) {
-        sortedArr.push(restaurants[keysSorted[key]])
+      var sortedArr = []
+        keysSorted = Object.keys(restaurants).sort(function(a,b){return restaurants[a]['location']['distance'] - restaurants[b]['location']['distance']})
+        for (var key in keysSorted) {
+          sortedArr.push(restaurants[keysSorted[key]])
+        }
+      if (sortedArr.length > 20) {
+        return resolve(sortedArr.slice(0, sortedArr.length - 1));
       }
-    if (sortedArr.length > 20) {
-      return sortedArr.slice(0, sortedArr.length - 1)
-    }
-    else {
-      return sortedArr.slice(0,19)
-    }}).then(function(value) {
-      return value;
-    })
-}
-
-//}).catch(function(error) {
-//  console.log(error)
-//});
-//};
-
-console.log(getAllNearbyRestaurants('45,-114', '47,-114'))
+      else {
+        return resolve(sortedArr.slice(0,19));
+      }
+    });
+  })
+};
+//getAllNearbyRestaurantsAlongRoute('45,-114', '47,-114').then(function(blah) {
+  // console.log(blah)
+// })
 
 //}).catch(function(error) {
   //console.log(error);
