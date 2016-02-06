@@ -2,12 +2,19 @@ var request = require('request');
 var Promise = require('bluebird');
 var fs = require('fs')
 // make a request to bing maps
-var mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=tampa%2Cfl&wp.1=portland%2Cor&avoid=minimizeTolls&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR'
+//var mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=tampa%2Cfl&wp.1=portland%2Cor&avoid=minimizeTolls&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR'
 
-function getRouteParams(url) {
+function getRouteParams(beginning, middle, end) {
+  var mapURL;
+  if (middle) {
+    mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&vwp.1='+middle+'&wp.2='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
+  }
+  else {
+    mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&wp.1='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
+  }
   return new Promise(function(resolve, reject) {
     // POSSIBLE RUNTIME BOTTLENECK: too many waypoints
-    request(url, function (error, response, body) {
+    request(mapURL, function (error, response, body) {
       //Check for error
       if(error){
         reject(error);
@@ -27,17 +34,16 @@ function getRouteParams(url) {
       var waypoints = important['routeLegs'][0]['itineraryItems'].map(function(value) {
         return value['maneuverPoint']['coordinates'];
       });
-      console.log(waypoints);
 
       params = {'waypoints': waypoints,
         'travelDurationTraffic': travelDurationTraffic,
         'travelDistance': travelDistance};
+      console.log(params)
       resolve(params);
     });
   });
 }
 
-getRouteParams(mapURL)
 function getNearbyRestaurants(lat, lng) {
   // var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+','+lng+'&section=food&limit=5oauth_token=AsSKpIwIftCSooG2C2GqXtK83nmSIj3IHfHN28vLJXYbVJ_p-x8Zs_3lm6ZBvu4k&v=20160206'
   var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=5&oauth_token=NPN00URCD44DLRMPRXQSZNOKCUQJS0L23UC0UGIYC4BHTKPY&v=20160206'
@@ -68,12 +74,34 @@ function getNearbyRestaurants(lat, lng) {
   });
   });
 }
-// getNearbyRestaurants(45, -115);
 
-function recalculateRoute(beginning, middle, end) {
-  var mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=tampa%2Cfl&wp.1=portland%2Cor&avoid=minimizeTolls&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR'
-}
-function getAllNearbyRestaurants(locationURL) {
+//// rewrite this
+//function recalculateRoute(beginning, middle, end) {
+//  var rerouteURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&vwp.1='+middle+'&wp.2='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
+//  return new Promise(function(resolve, reject) {
+//    request(rerouteURL, function (error, response, body) {
+//          //Check for error
+//    if(error){
+//      reject(error);
+//      // return console.log('Error:', error);
+//    }
+//    //Check for right status code
+//    if(response.statusCode !== 200){
+//      // return console.log('Invalid Status Code Returned:', response.statusCode);
+//      reject(response);
+//    }
+//    //All is good. Print the body
+//    var data = JSON.parse(body);
+//    var important = data['resourceSets'][0]['resources'][0]
+//    var travelDurationTraffic = important['travelDurationTraffic'];
+//    var travelDistance = important['travelDistance'];
+//    console.log([travelDurationTraffic, travelDistance])
+//    })
+//  })
+//}
+
+//recalculateRoute('45,-118','46,-118','47,-118')
+function getAllNearbyRestaurantsFile(locationURL) {
   restaurants = {};
   var result;
   fs.readFile('result.json', 'utf8', function(err, data) {
@@ -94,7 +122,7 @@ function getAllNearbyRestaurants(locationURL) {
         }
         else {
           restaurants[name] = {'dist':dist, 'lat':lat, 'lng':lng};
-        } 
+        }
       }
     }
   })
@@ -125,7 +153,7 @@ function getAllNearbyRestaurants(locationURL) {
 //       // }
 //       // else {
 //       //   restaurants[name] = {'dist':dist, 'lat':lat, 'lng':lng};
-//       // } 
+//       // }
 //     // }
 //     // console.log(restaurants);
 
@@ -147,4 +175,4 @@ function getAllNearbyRestaurants(locationURL) {
 //   //   console.log(error);
 //   // })
 }
-getAllNearbyRestaurants(mapURL);
+//getAllNearbyRestaurants(mapURL);
