@@ -112,12 +112,16 @@ function getAllNearbyRestaurantsAlongRoute(start, end) {
   })
 };
 
+app.use(function(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  return next();
+});
+
 app.get('/', function(req, res) {
   var start = req.query.start,
   end = req.query.end
 
   getAllNearbyRestaurantsAlongRoute(start, end).then(function(restaurants) {
-    res.writeHead(200, {'Access-Control-Allow-Origin':'*'});
     res.send(restaurants);
   })
 })
