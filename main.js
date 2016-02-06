@@ -17,19 +17,10 @@ request(URL, function (error, response, body) {
     }
     //All is good. Print the body
     var data = JSON.parse(body);
+    var trafficTime = data['resourceSets']
     var important = data['resourceSets'][0]['resources'][0]['routeLegs'][0];
-    var startPoint = important['actualStart']['coordinates'];
-    var startPoint = important['actualEnd']['coordinates'];
     var points = important['itineraryItems'].map(function(value) {
-      return value['maneuverPoint'];
+      return value['maneuverPoint']['coordinates'];
     });
-    console.log(points);
-    //console.log(data['authenticationResultCode']);
-    //if (data.hasOwnProperty('authenticationResultCode')) {
-    //  console.log("word");
-    //}
-    //for (var key in data) {
-    //     console.log("key: "+key+", value: "+data[key]);
-    //}
-
+    console.log(trafficTime);
 });
