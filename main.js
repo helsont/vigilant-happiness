@@ -1,7 +1,7 @@
 var request = require('request');
 var Promise = require('bluebird');
 // make a request to bing maps
-var mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=redmond%2Cwa&wp.1=Issaquah%2Cwa&avoid=minimizeTolls&key=AsdaxrvLRHyT6eEvSGDY81S2y3_ifh10egwFAMzIOLtxv0ZlwkPE2yG7jMzXzVkp'
+var mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=tampa%2Cfl&wp.1=portland%2Cor&avoid=minimizeTolls&key=AsdaxrvLRHyT6eEvSGDY81S2y3_ifh10egwFAMzIOLtxv0ZlwkPE2yG7jMzXzVkp'
 
 function getRouteParams(url) {
   return new Promise(function(resolve, reject) {
@@ -76,17 +76,25 @@ function getAllNearbyRestaurants(locationURL) {
     };
     return Promise.all(list);
   }).then(function(result) {
+    console.log(result);
     for (var r in result[0]) {
       var venue = result[0][r];
       var name = venue[0];
       var dist = venue[1];
       var lat = venue[2];
       var lng = venue[3];
-      restaurants[name] = {'dist':dist,
-                            'lat':lat,
-                            'lng':lng};
-      console.log(restaurants);
+      if (name in restaurants) {
+        if (dist < restaurants[name]['distance']) {
+          restaurant[name] = {'dist':dist, 'lat':lat, 'lng':lng};
+        }
+      }
+      else {
+        restaurants[name] = {'dist':dist, 'lat':lat, 'lng':lng};
+      } 
     }
+    console.log(restaurants);
+
+    // console.log(restaurants);
   }).catch(function(error) {
     console.log(error);
   });
