@@ -69,8 +69,23 @@ function getAllNearbyRestaurants(locationURL) {
   restaurants = {};
   getRouteParams(mapURL).then(function(routeParams) {
     var waypoints = routeParams['waypoints'];
+    var list = [];
     for (var waypoint in waypoints) {
-      
+      var lat = waypoints[waypoint][0], lng = waypoints[waypoint][1];
+      list.push(getNearbyRestaurants(lat, lng));
+    };
+    return Promise.all(list);
+  }).then(function(result) {
+    for (var r in result[0]) {
+      var venue = result[0][r];
+      var name = venue[0];
+      var dist = venue[1];
+      var lat = venue[2];
+      var lng = venue[3];
+      restaurants[name] = {'dist':dist,
+                            'lat':lat,
+                            'lng':lng};
+      console.log(restaurants);
     }
   }).catch(function(error) {
     console.log(error);
