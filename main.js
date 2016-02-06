@@ -12,14 +12,14 @@ function getRouteParams(beginning, middle, end) {
   else {
     mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&wp.1='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
   }
-  
+
   return new Promise(function(resolve, reject) {
     // POSSIBLE RUNTIME BOTTLENECK: too many waypoints
     request(mapURL, function (error, response, body) {
       //Check for error
       if(error){
         reject(error);
-        
+
       }
 
       //Check for right status code
@@ -254,23 +254,24 @@ function getAllNearbyRestaurants(start, end) {
       }
     }
     var sortedArr = []
-    keysSorted = Object.keys(restaurants).sort(function(a,b){return restaurants[a]['location']['distance'] - restaurants[b]['location']['distance']})
-    for (var key in keysSorted) {
-      sortedArr.push(restaurants[keysSorted[key]])
-    }
-
-    // HELSON HOW DO YOU RETURN THIS??
+      keysSorted = Object.keys(restaurants).sort(function(a,b){return restaurants[a]['location']['distance'] - restaurants[b]['location']['distance']})
+      for (var key in keysSorted) {
+        sortedArr.push(restaurants[keysSorted[key]])
+      }
     if (sortedArr.length > 20) {
       return sortedArr.slice(0, sortedArr.length - 1)
     }
     else {
       return sortedArr.slice(0,19)
-    }
+    }}).then(function(value) {
+      return value;
+    })
+}
 
-  }).catch(function(error) {
-    console.log(error)
-  });
-};
+//}).catch(function(error) {
+//  console.log(error)
+//});
+//};
 
 console.log(getAllNearbyRestaurants('45,-114', '47,-114'))
 
