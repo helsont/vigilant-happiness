@@ -102,7 +102,7 @@ function getAllNearbyRestaurantsAlongRoute(start, end) {
         for (var key in keysSorted) {
           sortedArr.push(restaurants[keysSorted[key]])
         }
-      if (sortedArr.length > 20) {
+      if (sortedArr.length < 20) {
         return resolve(sortedArr.slice(0, sortedArr.length - 1));
       }
       else {
