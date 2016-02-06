@@ -27,7 +27,7 @@ function getRouteParams(url) {
       var waypoints = important['routeLegs'][0]['itineraryItems'].map(function(value) {
         return value['maneuverPoint']['coordinates'];
       });
-
+      console.log(waypoints);
 
       params = {'waypoints': waypoints,
         'travelDurationTraffic': travelDurationTraffic,
@@ -37,6 +37,7 @@ function getRouteParams(url) {
   });
 }
 
+getRouteParams(mapURL)
 function getNearbyRestaurants(lat, lng) {
   // var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+','+lng+'&section=food&limit=5oauth_token=AsSKpIwIftCSooG2C2GqXtK83nmSIj3IHfHN28vLJXYbVJ_p-x8Zs_3lm6ZBvu4k&v=20160206'
   var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=5&oauth_token=NPN00URCD44DLRMPRXQSZNOKCUQJS0L23UC0UGIYC4BHTKPY&v=20160206'
@@ -68,6 +69,10 @@ function getNearbyRestaurants(lat, lng) {
   });
 }
 // getNearbyRestaurants(45, -115);
+
+function recalculateRoute(beginning, middle, end) {
+  var mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=tampa%2Cfl&wp.1=portland%2Cor&avoid=minimizeTolls&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR'
+}
 function getAllNearbyRestaurants(locationURL) {
   restaurants = {};
   var result;
@@ -92,7 +97,6 @@ function getAllNearbyRestaurants(locationURL) {
         } 
       }
     }
-    console.log(restaurants)
   })
 //   getRouteParams(mapURL).then(function(routeParams) {
 //     var waypoints = routeParams['waypoints'];
