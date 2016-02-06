@@ -14,6 +14,8 @@ function getRouteParams(beginning, middle, end) {
   else {
     mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&wp.1='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
   }
+  // for testing purposes
+  //mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=boston,ma&wp.1=portland,or&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
   return new Promise(function(resolve, reject) {
     // POSSIBLE RUNTIME BOTTLENECK: too many waypoints
     request(mapURL, function (error, response, body) {
@@ -45,7 +47,7 @@ function getRouteParams(beginning, middle, end) {
 
 function getNearbyRestaurants(lat, lng) {
   // TODO: WE NEED AN API KEY FOR THIS !!!!!!!!!!!!!!!!!!!
-  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=800&limit=5&oauth_token=BWMSGIL3SRZ5L1QMFLZCRFJYWSJGW4BNR1NINN2NTHTQ3GCR&v=20160206'
+  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=8&oauth_token=BWMSGIL3SRZ5L1QMFLZCRFJYWSJGW4BNR1NINN2NTHTQ3GCR&v=20160206'
     return new Promise(function(resolve, reject) {
       request(foursquareURL, function (error, response, body) {
         //Check for error
