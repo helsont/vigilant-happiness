@@ -14,14 +14,12 @@ function getRouteParams(beginning, middle, end) {
   else {
     mapURL = 'https://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0='+beginning+'&wp.1='+end+'&avoid=minimizeTolls&optimize=timeWithTraffic&key=AvgjGasVLJPnwD6rCqCJLmg1Qt8a4kJiIoR6E66lJ2htQfVigyJ27WvVYHhG8YgR';
   }
-
   return new Promise(function(resolve, reject) {
     // POSSIBLE RUNTIME BOTTLENECK: too many waypoints
     request(mapURL, function (error, response, body) {
       //Check for error
       if(error){
-        reject(error);
-
+        console.log(error)
       }
 
       //Check for right status code
@@ -47,7 +45,7 @@ function getRouteParams(beginning, middle, end) {
 
 function getNearbyRestaurants(lat, lng) {
   // TODO: WE NEED AN API KEY FOR THIS !!!!!!!!!!!!!!!!!!!
-  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=5&oauth_token=L2BK0KGD3VN5FXF1QXUQZZEWNMXGFIBTSSACXU5KYEDLNIWL&v=20160206'
+  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=5&oauth_token=BWMSGIL3SRZ5L1QMFLZCRFJYWSJGW4BNR1NINN2NTHTQ3GCR&v=20160206'
     return new Promise(function(resolve, reject) {
       request(foursquareURL, function (error, response, body) {
         //Check for error
@@ -60,6 +58,7 @@ function getNearbyRestaurants(lat, lng) {
         }
         //All is good. Print the body
         var data = JSON.parse(body);
+        //console.log(data)
         var important = data['response']['groups'][0]['items'];
         var places = important.map(function(value) {
           return value['venue']
@@ -77,7 +76,7 @@ function getAllNearbyRestaurantsAlongRoute(start, end) {
       var capacityLimiter = parseInt(waypoints.length / 30)
       var list = [];
       var counter = 0
-      console.log('cap lim is ' + capacityLimiter)
+      //console.log('cap lim is ' + capacityLimiter)
       for (var waypoint in waypoints) {
         var lat = waypoints[waypoint][0], lng = waypoints[waypoint][1];
         if (capacityLimiter > 1) {
@@ -90,7 +89,7 @@ function getAllNearbyRestaurantsAlongRoute(start, end) {
         }
         counter += 1
       };
-      console.log(list.length)
+      //console.log(list.length)
       return Promise.all(list);
     }).then(function(result) {
       restaurants = {}
