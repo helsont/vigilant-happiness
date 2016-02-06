@@ -40,14 +40,14 @@ function getRouteParams(beginning, middle, end) {
       params = {'waypoints': waypoints,
         'travelDurationTraffic': travelDurationTraffic,
         'travelDistance': travelDistance};
-      //console.log(params)
       resolve(params);
     });
   });
 }
 
 function getNearbyRestaurants(lat, lng) {
-  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=5&oauth_token=NPN00URCD44DLRMPRXQSZNOKCUQJS0L23UC0UGIYC4BHTKPY&v=20160206'
+  // TODO: WE NEED AN API KEY FOR THIS !!!!!!!!!!!!!!!!!!!
+  var foursquareURL = 'https://api.foursquare.com/v2/venues/explore?ll='+lat+'%2C'+lng+'&section=food&radius=1500&limit=5&oauth_token=L2BK0KGD3VN5FXF1QXUQZZEWNMXGFIBTSSACXU5KYEDLNIWL&v=20160206'
     return new Promise(function(resolve, reject) {
       request(foursquareURL, function (error, response, body) {
         //Check for error
@@ -74,11 +74,23 @@ function getAllNearbyRestaurantsAlongRoute(start, end) {
   return new Promise(function(resolve, reject) {
     return getRouteParams(start, '', end).then(function(routeParams) {
       var waypoints = routeParams['waypoints'];
+      var capacityLimiter = parseInt(waypoints.length / 30)
       var list = [];
+      var counter = 0
+      console.log('cap lim is ' + capacityLimiter)
       for (var waypoint in waypoints) {
         var lat = waypoints[waypoint][0], lng = waypoints[waypoint][1];
-        list.push(getNearbyRestaurants(lat, lng));
+        if (capacityLimiter > 1) {
+          if (counter % capacityLimiter == 0) {
+            list.push(getNearbyRestaurants(lat, lng));
+          }
+        }
+        else {
+          list.push(getNearbyRestaurants(lat, lng));
+        }
+        counter += 1
       };
+      console.log(list.length)
       return Promise.all(list);
     }).then(function(result) {
       restaurants = {}
@@ -98,7 +110,7 @@ function getAllNearbyRestaurantsAlongRoute(start, end) {
         }
       }
       var sortedArr = []
-        keysSorted = Object.keys(restaurants).sort(function(a,b){return restaurants[a]['location']['distance'] - restaurants[b]['location']['distance']})
+      var keysSorted = Object.keys(restaurants).sort(function(a,b){return restaurants[a]['location']['distance'] - restaurants[b]['location']['distance']})
         for (var key in keysSorted) {
           sortedArr.push(restaurants[keysSorted[key]])
         }
